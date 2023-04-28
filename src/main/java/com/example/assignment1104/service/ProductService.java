@@ -1,6 +1,7 @@
 package com.example.assignment1104.service;
 
 import com.example.assignment1104.entity.Product;
+import com.example.assignment1104.exception.ProductNotFoundException;
 import com.example.assignment1104.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class ProductService {
     }
 
     public Product getById(int id){
-        return productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product id: " + id + " not found"));
+        return productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
     }
 
     public Product save(Product product){
@@ -34,10 +35,12 @@ public class ProductService {
             productFound.setQuantity(product.getQuantity());
             productFound.setDescription(product.getDescription());
             return productRepository.save(productFound);
-        }).orElse(null);
+        }).orElseThrow(() -> new ProductNotFoundException(id));
     }
 
     public void delete(int id){
-        productRepository.deleteById(id);
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+        productRepository.delete(product);
     }
 }

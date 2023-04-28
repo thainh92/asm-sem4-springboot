@@ -1,6 +1,8 @@
 package com.example.assignment1104.service;
 
 import com.example.assignment1104.entity.*;
+import com.example.assignment1104.exception.OrderNotFoundException;
+import com.example.assignment1104.exception.ProductNotFoundException;
 import com.example.assignment1104.repository.CustomerRepository;
 import com.example.assignment1104.repository.OrderDetailRepository;
 import com.example.assignment1104.repository.OrderRepository;
@@ -31,7 +33,7 @@ public class OrderService {
     }
 
     public Order getById(int id){
-        return orderRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Order id: " + id + " not found"));
+        return orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
     }
 
     public Order create(OrderDto order) {
@@ -59,7 +61,7 @@ public class OrderService {
         return orderRepository.save(newOrder);
     }
 
-    //ham nay dang loi em lam hoi voi co thong cam ^^
+    //run is wrong
     public Order update(int orderId, OrderDto updatedOrder) {
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
         if (optionalOrder.isPresent()) {
@@ -88,6 +90,8 @@ public class OrderService {
     }
 
     public void delete(int id){
-        orderRepository.deleteById(id);
+        Order order = orderRepository.findById(id)
+                        .orElseThrow(() -> new OrderNotFoundException(id));
+        orderRepository.delete(order);
     }
 }
